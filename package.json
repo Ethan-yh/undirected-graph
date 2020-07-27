@@ -1,0 +1,30 @@
+{
+    "name": "undirected-graph",
+    "version": "1.0.0",
+    "description": "An undirected-graph application",
+    "main": "main.js",
+    "build": {
+        "appId": "com.undirected-graph.app",
+        "mac": {
+            "target": [
+                "dmg",
+                "zip"
+            ]
+        },
+        "win": {
+            "target": [
+                "nsis",
+                "zip"
+            ],
+            "icon": "./images/metro.ico"
+        }
+    },
+    "scripts": {
+        "start": "electron .",
+        "dist": "electron-builder --win --x64"
+    },
+    "author": "Ethan-yh",
+    "devDependencies": {
+        "electron": "^9.1.0"
+    }
+}

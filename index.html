@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+
+
+    <link href="static/style/bootstrap-3.3.7.min.css" rel="stylesheet">
+    <link href="static/style/app.css" rel="stylesheet">
+    <link href="static/style/iconfont/material-icons.css" rel="stylesheet">
+
+    <script src="renderer/delete.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/qunee-min.js"></script>
+    <script src="lib/bootstrap-3.3.7.min.js"></script>
+
+
+    <title>无向图</title>
+</head>
+
+<body>
+    <div id="graph-panel" class="q-panel">
+        <ul id="select-tabs" class="nav nav-tabs">
+            <li class="active"><a id="tab-edit" data-toggle="tab" href="#edit-content">编辑</a></li>
+            <li class="dropdown">
+                <a href="#" id="tab-MST" class="dropdown-toggle" data-toggle="dropdown">最小生成树 <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu" role="menu" aria-labelledby="tab_MST">
+                    <li><a id="tab-prim" href="#prim-content" tabindex="-1" data-toggle="tab">
+                            Prim算法</a>
+                    </li>
+                    <li><a id="tab-kruskal" href="#kruskal-content" tabindex="-1" data-toggle="tab">
+                            Kruskal算法</a>
+                    </li>
+                </ul>
+            </li>
+            <li><a id="tab-single-source" data-toggle="tab" href="#single-source-content">单源最短路径</a></li>
+            <li><a id="tab-multi-source" data-toggle="tab" href="#multi-source-content">多源最短路径</a></li>
+        </ul>
+
+
+
+        <div id="tab-content" class="tab-content">
+
+            <div id="edit-content" class="tab-pane fade in active">
+                <div class="toolbar-panel">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm active interaction-mode" title="默认模式" onclick="setMode(this)">
+                                <div class="q-icon toolbar-default"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm interaction-mode" title="框选模式" onclick="setMode(this)">
+                                <div class="q-icon toolbar-rectangle_selection"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm interaction-mode" title="浏览模式" onclick="setMode(this)">
+                                <div class="q-icon toolbar-pan"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm interaction-mode" title="创建连线" onclick="setMode(this)">
+                                <div class="q-icon toolbar-edge"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="放大" onclick="zoom('in')">
+                                <div class="q-icon toolbar-zoomin"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="缩小" onclick="zoom('out')">
+                                <div class=" q-icon toolbar-zoomout"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="1:1" onclick="zoom('center')">
+                                <div class="q-icon toolbar-zoomreset"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="纵览" onclick="zoom('overview')">
+                                <div class="q-icon toolbar-zoom_overview"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div id="prim-content" class="tab-pane fade">
+                <div class="toolbar-panel">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="放大" onclick="zoom('in')">
+                                <div class="q-icon toolbar-zoomin"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="缩小" onclick="zoom('out')">
+                                <div class=" q-icon toolbar-zoomout"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="1:1" onclick="zoom('center')">
+                                <div class="q-icon toolbar-zoomreset"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="纵览" onclick="zoom('overview')">
+                                <div class="q-icon toolbar-zoom_overview"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="执行" onclick="prim('run')">
+                                <div class="icons-run"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="单步执行" onclick="prim('nextStep')">
+                                <div class="icons-nextstep"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="重置" onclick="reset()">
+                                <div class="icons-reset"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="kruskal-content" class="tab-pane fade">
+                <div class="toolbar-panel">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="放大" onclick="zoom('in')">
+                                <div class="q-icon toolbar-zoomin"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="缩小" onclick="zoom('out')">
+                                <div class=" q-icon toolbar-zoomout"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="1:1" onclick="zoom('center')">
+                                <div class="q-icon toolbar-zoomreset"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="纵览" onclick="zoom('overview')">
+                                <div class="q-icon toolbar-zoom_overview"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="执行" onclick="kruskal('run')">
+                                <div class="icons-run"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="单步执行" onclick="kruskal('nextStep')">
+                                <div class="icons-nextstep"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="重置" onclick="reset()">
+                                <div class="icons-reset"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="single-source-content" class="tab-pane fade">
+                <div class="toolbar-panel">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="放大" onclick="zoom('in')">
+                                <div class="q-icon toolbar-zoomin"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="缩小" onclick="zoom('out')">
+                                <div class=" q-icon toolbar-zoomout"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="1:1" onclick="zoom('center')">
+                                <div class="q-icon toolbar-zoomreset"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="纵览" onclick="zoom('overview')">
+                                <div class="q-icon toolbar-zoom_overview"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="执行" onclick="singleSource()">
+                                <div class="icons-run"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="重置" onclick="reset()">
+                                <div class="icons-reset"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="multi-source-content" class="tab-pane fade">
+                <div class="toolbar-panel">
+                    <div class="btn-toolbar" role="toolbar">
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="放大" onclick="zoom('in')">
+                                <div class="q-icon toolbar-zoomin"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="缩小" onclick="zoom('out')">
+                                <div class=" q-icon toolbar-zoomout"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="1:1" onclick="zoom('center')">
+                                <div class="q-icon toolbar-zoomreset"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="纵览" onclick="zoom('overview')">
+                                <div class="q-icon toolbar-zoom_overview"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="width:100%;height:100%;" id="canvas" />
+        </div>
+
+
+
+    </div>
+
+    <!-- You can also require other files to run in this process -->
+    <script src="renderer/renderer.js"></script>
+</body>
+
+</html>

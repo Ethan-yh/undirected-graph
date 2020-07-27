@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Hello Qunee for HTML5</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="static/style/demo.css">
+    <link rel="stylesheet" href="static/style/bootstrap.min.css">
+</head>
+
+<body>
+    <div id="graph_panel" class="q-panel">
+        <div role="toolbar" class="q-toolbar">
+        </div>
+        <div class="q-content">
+            <div id="canvas" class="Q-Graph">
+                <div class="Q-CanvasPanel" tabindex="0" style="cursor: default;"><canvas class="Q-Canvas" width="734" height="608" style="width: 734px; height: 608px;"></canvas><canvas class="Q-Canvas" width="734" height="608" style="width: 734px; height: 608px;"></canvas>
+                    <div class="Q-Graph-ScrollPane" style="width: 100%; height: 100%; position: relative;">
+                        <div class="Q-Graph-ScrollBar Q-Graph-ScrollBar--V                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Both"
+                            style="top: 0px; bottom: 32px;"></div>
+                        <div class="Q-Graph-ScrollBar Q-Graph-ScrollBar--H                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 Both"
+                            style="left: 15px; right: 0px;"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="overview" style="width: 150px;height: 120px;box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.2);position: absolute;right: 5px;top: 5px;background-color: #FFF;"><canvas width="150" height="120" style="width: 150px; height: 120px;"></canvas></div>
+            <style>
+                .Q-Export-JSON {
+                    position: absolute;
+                    top: 0px;
+                    bottom: 0px;
+                    right: 0px;
+                    left: 0px;
+                    background: #DDD;
+                    opacity: 0.9;
+                    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+                }
+            </style>
+            <div class="Q-Export-JSON" id="Q-JSON-Panel" style="height: 0px; overflow: hidden;">
+                <div style="background: #EEE; position: absolute; top: 50px; bottom: 0px; width: 100%; overflow: auto;">
+                    <textarea id="json_code_panel" style="height: 100%; width: 100%; border: none;"></textarea>
+                </div>
+                <div style="padding: 10px; height: 50px; float: right; position: relative;">
+                    <div id="btnJSONSubmit" class="btn btn-primary btn-sm" title="Submit">Submit</div>
+                    <div id="btnJSONClose" class="btn btn-primary btn-sm" title="Close">Close</div>
+                </div>
+            </div>
+            <div class="mask" id="mask_panel">
+                <div class="loading">Loading...</div>
+            </div>
+            <div id="toolbox" style="position: absolute; top: 0px;"><img src="images/node_icon.png" draggable="true" title="Mac" draginfo="{&quot;type&quot;:&quot;Node&quot;,&quot;label&quot;:&quot;Mac&quot;,&quot;image&quot;:&quot;Q.Graphs.node&quot;,&quot;title&quot;:&quot;Mac&quot;}"><img src="images/exchanger_icon.png"
+                    draggable="true" title="Exchanger" draginfo="{&quot;type&quot;:&quot;Node&quot;,&quot;label&quot;:&quot;Exchanger&quot;,&quot;image&quot;:&quot;Q.Graphs.exchanger2&quot;,&quot;title&quot;:&quot;Exchanger&quot;}"><img src="images/server_icon.png"
+                    draggable="true" title="Server" draginfo="{&quot;type&quot;:&quot;Node&quot;,&quot;label&quot;:&quot;Server&quot;,&quot;image&quot;:&quot;Q.Graphs.server&quot;,&quot;title&quot;:&quot;Server&quot;}"><img src="images/text_icon.png" draggable="true"
+                    title="Text" draginfo="{&quot;type&quot;:&quot;Text&quot;,&quot;label&quot;:&quot;Text&quot;,&quot;title&quot;:&quot;Text&quot;}"><img src="images/group_icon.png" draggable="true" title="Group" draginfo="{&quot;type&quot;:&quot;Group&quot;,&quot;label&quot;:&quot;Group&quot;,&quot;title&quot;:&quot;Group&quot;}">
+                <img src="images/subnetwork_icon.png" draggable="true" title="SubNetwork" draginfo="{&quot;image&quot;:&quot;Q-subnetwork&quot;,&quot;label&quot;:&quot;SubNetwork&quot;,&quot;properties&quot;:{&quot;enableSubNetwork&quot;:true},&quot;title&quot;:&quot;SubNetwork&quot;}"
+                    style="width: 24px;"></div>
+        </div>
+    </div>
+    <script src="./lib/jquery.min.js"></script>
+    <script src="./lib/qunee-min.js"></script>
+    <script type="text/javascript" src="common.js"></script>
+    <script type="text/javascript" src="test.js"></script>
+
+</body>
+
+</html>
