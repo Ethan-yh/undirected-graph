@@ -4,6 +4,8 @@ const path = require('path')
 const prim = require('./main/prim')
 const kruskal = require('./main/kruskal')
 const dijkstra = require('./main/dijkstra')
+const floyd = require('./main/floyd')
+
 
 function createWindow() {
     // Create the browser window.
@@ -61,4 +63,9 @@ ipcMain.on('getMstByKruskal', (event, arg) => {
 ipcMain.on('getSingleSource', (event, arg) => {
     var paths = dijkstra.dijkstra(arg.source, arg.adjMatrix);
     event.sender.send('replySingleSource', paths);
+})
+
+ipcMain.on('getMultiSource', (event, arg) => {
+    var paths = floyd.floyd(arg);
+    event.sender.send('replyMultiSource', paths);
 })

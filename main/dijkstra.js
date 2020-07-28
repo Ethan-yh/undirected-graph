@@ -12,7 +12,7 @@ function dijkstra(source, adjMatrix) {
     var prev = {}; //记录前驱
     var dist = {}; //记录距离
     var flag = {}; //记录是否以及找到路径
-    var num = Object.keys(adjMatrix).length
+    var num = Object.keys(adjMatrix).length;
     for (let id in adjMatrix) {
         flag[id] = 0;
         prev[id] = source;
@@ -23,12 +23,7 @@ function dijkstra(source, adjMatrix) {
     flag[source] = 1;
     dist[source] = 0;
     prev[source] = null;
-    for (let id in adjMatrix) {
-        if (dist[id] > min + adjMatrix[source][id].power) {
-            dist[id] = min + adjMatrix[source][id].power;
-            prev[id] = '' + source;
-        }
-    }
+
     var min;
     for (let i = 0; i < num; i++) {
         min = Number.MAX_VALUE;

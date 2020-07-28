@@ -59,7 +59,7 @@ function destroy() {
 }
 
 initToolbox();
-initDatas();
+// initDatas();
 
 
 function initToolbox() {
@@ -96,6 +96,8 @@ function initDatas() {
     var edge10 = graph.createEdge("9", node5, node7);
 
     var edge11 = graph.createEdge("11", node6, node7);
+
+    var edge12 = graph.createEdge("6", node1, node2);
 }
 
 var curTab = 'tab-edit';
@@ -158,10 +160,79 @@ function zoom(e) {
     }
 }
 
-function mstPrim() {
+//邻接链表
+function getAdjList() {
+    var adjListDiv;
+    adjListDiv = document.getElementById('adj-list');
+    var btns = document.getElementsByClassName('btn-adjList');
+    if (adjListDiv) {
+        adjListDiv.remove();
+        for (let i = 0; i < btns.length; i++) {
+            Q.removeClass(btns[i], 'active');
+        }
+        return;
+    }
 
+    var adjList = {};
+    var adjMatrix = getDatas().adjMatrix;
+    for (let i = 0; i < btns.length; i++) {
+        Q.appendClass(btns[i], 'active');
+    }
+    for (let id1 in adjMatrix) {
+        adjList[id1] = [];
+        for (let id2 in adjMatrix[id1]) {
+            if (id2 != id1 && adjMatrix[id1][id2].power < Number.MAX_VALUE) {
+                adjList[id1].push({ nodeId: id2, power: adjMatrix[id1][id2].power });
+            }
+
+        }
+    }
+
+    adjListDiv = document.createElement('div');
+    adjListDiv.id = 'adj-list'
+    var adjListHead = document.createElement('h4');
+    adjListHead.innerHTML = '邻接链表';
+    adjListDiv.appendChild(adjListHead);
+
+    for (let id in adjList) {
+        var listItem = document.createElement('a');
+        Q.appendClass(listItem, "list-group-item");
+        listItem.innerHTML = '';
+        listItem.innerHTML += '<strong>' + graph.getElement(id).name + ' : ' + '</strong>';
+        adjList[id].forEach((e, index) => {
+            if (index !== 0) {
+                listItem.innerHTML += '->'
+            }
+            listItem.innerHTML += graph.getElement(e.nodeId).name + '(' + e.power + ')';
+        });
+        adjListDiv.appendChild(listItem);
+    }
+
+    var tabContentElement = document.getElementById('tab-content');
+    tabContentElement.appendChild(adjListDiv);
 }
 
+function isSimpleConnectedGraph() {
+    var datas = graph.graphModel.datas;
+    if (datas.length == 0) {
+        return 0;
+    }
+    for (let i = 0; i < datas.length; i++) {
+        if (!datas[i].from) {
+            var linkedNodes = datas[i]._linkedNodes;
+            if (datas[i].edgeCount == 0) {
+                console.log(datas[i]);
+                return 0;
+            }
+            for (let id in linkedNodes) {
+                if (linkedNodes[id].edges.length > 1) {
+                    return 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
 
 
 //获取邻接矩阵和边集合
@@ -173,18 +244,16 @@ function getDatas() {
     var edges = [];
     datas.forEach(data => {
         if (data.from) {
-            console.log('边', data);
-            edges.push({ id: data.id, from: data.from.id, to: data.to.id, power: parseInt(data.name) });
+            edges.push({ id: data.id, from: data.from.id, to: data.to.id, power: parseFloat(data.name) });
             if (!adjMatrix[data.from.id]) {
                 adjMatrix[data.from.id] = {};
             }
             if (!adjMatrix[data.to.id]) {
                 adjMatrix[data.to.id] = {};
             }
-            adjMatrix[data.from.id][data.to.id] = { edge: data.id, power: parseInt(data.name) };
-            adjMatrix[data.to.id][data.from.id] = { edge: data.id, power: parseInt(data.name) };
+            adjMatrix[data.from.id][data.to.id] = { edge: data.id, power: parseFloat(data.name) };
+            adjMatrix[data.to.id][data.from.id] = { edge: data.id, power: parseFloat(data.name) };
         } else {
-            console.log('点', data);
             if (!adjMatrix[data.id]) {
                 adjMatrix[data.id] = {};
             }
@@ -201,18 +270,19 @@ function getDatas() {
     return { adjMatrix, edges };
 }
 
+
+
+
 //最小生成树
 var mst = [];
-
-function getMst() {
-    if (mst.length == 0) {
-        ipcRenderer.send('getMstByPrim', getDatas().adjMatrix);
-    }
-}
 
 var mode;
 
 function prim(_mode) {
+    if (!isSimpleConnectedGraph()) {
+        showWarning('图必须2点以上连通图，且2点之间至多只能有一条边');
+        return;
+    }
     mode = _mode;
     if (mst.length == 0) {
         ipcRenderer.send('getMstByPrim', getDatas().adjMatrix);
@@ -223,6 +293,10 @@ function prim(_mode) {
 }
 
 function kruskal(_mode) {
+    if (!isSimpleConnectedGraph()) {
+        showWarning('图必须2点以上连通图，且2点之间至多只能有一条边');
+        return;
+    }
     mode = _mode;
     if (mst.length == 0) {
         ipcRenderer.send('getMstByKruskal', getDatas());
@@ -232,6 +306,7 @@ function kruskal(_mode) {
     }
 }
 
+//单步执行当前步骤
 var curStep;
 
 function mstRunByMode() {
@@ -257,6 +332,29 @@ function mstRunByMode() {
     }
 }
 
+
+
+function singleSource() {
+    if (!isSimpleConnectedGraph()) {
+        showWarning('图必须2点以上连通图，且2点之间至多只能有一条边');
+        return;
+    }
+    if (!source) {
+        showWarning('请先点击某个点作为起点');
+        return;
+    }
+    ipcRenderer.send('getSingleSource', { source: source.id, adjMatrix: getDatas().adjMatrix });
+}
+
+function multiSource() {
+    if (!isSimpleConnectedGraph()) {
+        showWarning('图必须2点以上连通图，且2点之间至多只能有一条边');
+        return;
+    }
+    ipcRenderer.send('getMultiSource', getDatas().adjMatrix);
+}
+
+//设置透明
 function setTransparent() {
     var datas = graph.graphModel.datas;
     datas.forEach((e) => {
@@ -264,6 +362,7 @@ function setTransparent() {
     })
 }
 
+//重置
 function reset() {
     curStep = 0;
     var datas = graph.graphModel.datas;
@@ -272,45 +371,49 @@ function reset() {
     })
 
     if (source) {
+        console.log('source', source)
         source.removeUI(startUI);
+        source = null;
     }
+
+
 
     $("#singleSourcePathsList").remove();
+    $("#multiSourcePathsList").remove();
 }
 
-function singleSource() {
-    console.log(source);
-    if (!source) {
-        return;
-    }
-    ipcRenderer.send('getSingleSource', { source: source.id, adjMatrix: getDatas().adjMatrix });
-}
+var singlePaths;
+var multiPaths;
 
-var paths;
 
 function showPath(e) {
-    if (!paths) {
-        return;
-    }
-    console.log('e', e)
 
-    var pathId = e.getAttribute('pathid');
-    console.log('pathId', pathId)
-    var pathElements = document.getElementsByClassName('single-source-path');
-    for (let i = 0; i < pathElements.length; i++) {
-        Q.removeClass(pathElements[i], "active");
+    console.log('e', e)
+    var pathType = e.getAttribute('pathtype');
+
+    var pathElements;
+    var path;
+    if (pathType === 'single') {
+        pathElements = document.getElementsByClassName('single-source-path');
+        var pathId = e.getAttribute('pathid');
+        path = singlePaths[pathId];
+    } else if (pathType === 'multi') {
+        pathElements = document.getElementsByClassName('multi-source-path');
+        var pathId1 = e.getAttribute('pathid1');
+        var pathId2 = e.getAttribute('pathid2');
+        path = multiPaths[pathId1][pathId2];
     }
-    Q.appendClass(e, "active");
+
+
+    for (let i = 0; i < pathElements.length; i++) {
+        Q.removeClass(pathElements[i], 'active');
+    }
+    Q.appendClass(e, 'active');
 
     setTransparent();
-
-
-    var path = paths[pathId];
     console.log('path', path)
-    if (path.length == 1) {
-        var node = graph.getElement(pathId);
-        node.setStyle(Q.Styles.ALPHA, 1);
-    }
+    var firstNode = graph.getElement(path[0]);
+    firstNode.setStyle(Q.Styles.ALPHA, 1);
     for (let i = 1; i < path.length; i++) {
         var edgeId = adjMatrix[path[i - 1]][path[i]].edge;
         edge = graph.getElement(edgeId);
@@ -321,42 +424,84 @@ function showPath(e) {
     }
 }
 
+var isShowingEditTooltip = false;
+
+function showEditTooltip(btnEle) {
+    var tooltipDiv = document.getElementById('edit-tooltip');
+    if (isShowingEditTooltip) {
+        Q.removeClass(btnEle, 'active');
+        Q.appendClass(tooltipDiv, 'fade');
+    } else {
+        Q.appendClass(btnEle, 'active');
+        Q.removeClass(tooltipDiv, 'fade');
+    }
+
+    isShowingEditTooltip = !isShowingEditTooltip;
+
+}
+
 ipcRenderer.on('replyMst', (event, arg) => {
     mst = arg;
     mstRunByMode();
 })
 
 
+function createPathListElement(path, classes, attributes) {
+    var pathListItem = document.createElement("a");
+    pathListItem.href = "#";
+    Q.appendClass(pathListItem, "list-group-item");
+    pathListItem.innerHTML = '';
+    var start = graph.getElement(path[0]);
+    var end = graph.getElement(path[path.length - 1]);
+    pathListItem.innerHTML += '<strong>' + start.name + '-' + end.name + ' : ' + '</strong>';
+
+    classes.forEach(className => {
+        Q.appendClass(pathListItem, className);
+    })
+
+    for (let attr in attributes) {
+        pathListItem.setAttribute(attr, attributes[attr]);
+    }
+    pathListItem.addEventListener('click', (ev) => {
+        console.log(ev.target);
+        showPath(ev.target);
+    })
+    path.forEach(nodeId => {
+        pathListItem.innerHTML += graph.getElement(nodeId).name + ' ';
+    })
+    return pathListItem;
+}
+
 ipcRenderer.on('replySingleSource', (event, arg) => {
-    paths = arg;
+    singlePaths = arg;
     var singleSourceContent = document.getElementById('single-source-content');
     $("#singleSourcePathsList").remove();
     var singleSourcePathsList = document.createElement("div");
     singleSourcePathsList.id = "singleSourcePathsList";
 
-    for (let id in paths) {
-        var path = document.createElement("a");
-        path.href = "#";
-        Q.appendClass(path, "list-group-item");
-        Q.appendClass(path, "single-source-path");
-        path.innerHTML = '';
-
-        var end = graph.getElement(paths[id][paths[id].length - 1]);
-        path.innerHTML += '<strong>' + source.name + '-' + end.name + ' : ' + '</strong>';
-        path.setAttribute("pathid", id);
-        path.addEventListener('click', (ev) => {
-            console.log(ev.target);
-            showPath(ev.target);
-
-        });
-
-        paths[id].forEach(nodeId => {
-            path.innerHTML += graph.getElement(nodeId).name + ' ';
-        })
-        singleSourcePathsList.appendChild(path);
+    for (let id in singlePaths) {
+        var pathListItem = createPathListElement(singlePaths[id], ['single-source-path'], { pathtype: 'single', pathid: id })
+        singleSourcePathsList.appendChild(pathListItem);
     }
 
-    singleSourceContent.appendChild(singleSourcePathsList)
+    singleSourceContent.appendChild(singleSourcePathsList);
+
+})
+
+ipcRenderer.on('replyMultiSource', (event, arg) => {
+    multiPaths = arg;
+    var multiSourceContent = document.getElementById('multi-source-content');
+    $("#multiSourcePathsList").remove();
+    var multiSourcePathsList = document.createElement("div");
+    multiSourcePathsList.id = "multiSourcePathsList";
+
+    for (let id1 in multiPaths) {
+        for (let id2 in multiPaths[id1]) {
+            var pathListItem = createPathListElement(multiPaths[id1][id2], ['multi-source-path'], { pathtype: 'multi', pathid1: id1, pathid2: id2 })
+            multiSourcePathsList.appendChild(pathListItem);
+        }
+    }
+    multiSourceContent.appendChild(multiSourcePathsList);
 
 })
 
@@ -384,12 +529,51 @@ graph.addCustomInteraction({
                     source = element;
                 }
             }
-
-        } else {
-
-            source.removeUI(startUI);
-            source = null;
         }
 
     }
 });
+
+function showWarning(text) {
+    $('#warning-text').alert('close');
+    var infoDiv = document.createElement('div');
+    infoDiv.id = 'warning-text'
+    Q.appendClass(infoDiv, 'alert');
+    Q.appendClass(infoDiv, 'alert-warning');
+    infoDiv.innerHTML = '<a href="#" class="close" data-dismiss="alert">&times;</a>';
+    infoDiv.innerHTML += text;
+
+    var tabContentDiv = document.getElementById('tab-content');
+    tabContentDiv.appendChild(infoDiv);
+
+}
+
+var nameId = 1;
+
+graph.onElementCreated = function(element, evt, dragInfo) {
+
+    if (element.from) {
+        element.name = 10;
+        element.setStyle(Q.Styles.ARROW_TO, false);
+    } else {
+        element.name = 'node' + nameId;
+        nameId++;
+    }
+}
+
+graph.onLabelEdit = function(element, label, text, elementUI) {
+    if (element.from) {
+        var power = parseFloat(text);
+        if (power) {
+            if (power < 0) {
+                showWarning('请输入非负数字');
+                return;
+            }
+            element.name = '' + power;
+        } else {
+            showWarning('请输入非负数字');
+        }
+        return;
+    }
+    element.name = text;
+}

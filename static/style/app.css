@@ -62,7 +62,32 @@ body {
 
 #singleSourcePathsList {
     position: absolute;
+    overflow-y: auto;
+    overflow-x: auto;
+    top: 10%;
+    height: 70%;
     width: 20%;
+    z-index: 40;
+}
+
+#multiSourcePathsList {
+    position: absolute;
+    overflow-y: auto;
+    overflow-x: auto;
+    top: 10%;
+    height: 70%;
+    width: 20%;
+    z-index: 40;
+}
+
+#adj-list {
+    position: absolute;
+    overflow-y: auto;
+    overflow-x: auto;
+    top: 10%;
+    right: 0px;
+    height: 70%;
+    width: 40%;
     z-index: 40;
 }
 
@@ -77,6 +102,21 @@ body {
 
 #toolbox button {
     margin-right: 5px;
+}
+
+#warning-text {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    z-index: 40;
+}
+
+#edit-tooltip {
+    position: absolute;
+    top: 40px;
+    right: 0px;
+    width: 30%;
+    z-index: 40;
 }
 
 
@@ -263,6 +303,18 @@ body {
 
 .icons-reset {
     background-image: url(../images/reset.png);
+    width: 16px;
+    height: 16px;
+}
+
+.icons-adjList {
+    background-image: url(../images/adjList.png);
+    width: 16px;
+    height: 16px;
+}
+
+.icons-tooltip {
+    background-image: url(../images/tooltip.png);
     width: 16px;
     height: 16px;
 }

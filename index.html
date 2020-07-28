@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';img-src 'self' 'unsafe-inline'">
     <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'">
 
 
@@ -76,8 +76,35 @@
                                 <div class="q-icon toolbar-zoom_overview"></div>
                             </div>
                         </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="重置" onclick="reset()">
+                                <div class="icons-reset"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm btn-adjList" title="显示邻接链表" onclick="getAdjList()">
+                                <div class="icons-adjList"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="操作提示" onclick="showEditTooltip(this)">
+                                <div class="icons-tooltip"></div>
+                            </div>
+                        </div>
                     </div>
 
+                </div>
+                <div id="edit-tooltip" class="panel panel-success fade">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">操作提示</h3>
+                    </div>
+                    <div class="panel-body">
+                        <strong>默认模式下</strong><br> [加入点]----拖动左侧图标框内容
+                        <br> [删除]----选中后按退格键
+                        <br> [编辑名字或边权重]----双击标签，回车确认
+                        <br>
+                        <strong>创建连线模式下</strong><br> [创建连线]----从一个点拖动到另一个点，默认权重为10，可在默认模式下修改
+                    </div>
                 </div>
             </div>
             <div id="prim-content" class="tab-pane fade">
@@ -106,6 +133,11 @@
                             </div>
                             <div class="btn btn-default btn-sm" title="重置" onclick="reset()">
                                 <div class="icons-reset"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm btn-adjList" title="显示邻接链表" onclick="getAdjList()">
+                                <div class="icons-adjList"></div>
                             </div>
                         </div>
                     </div>
@@ -139,6 +171,11 @@
                                 <div class="icons-reset"></div>
                             </div>
                         </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm btn-adjList" title="显示邻接链表" onclick="getAdjList()">
+                                <div class="icons-adjList"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -167,6 +204,11 @@
                                 <div class="icons-reset"></div>
                             </div>
                         </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm btn-adjList" title="显示邻接链表" onclick="getAdjList()">
+                                <div class="icons-adjList"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -187,6 +229,19 @@
                             </div>
                             <div class="btn btn-default btn-sm" title="纵览" onclick="zoom('overview')">
                                 <div class="q-icon toolbar-zoom_overview"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm" title="执行" onclick="multiSource()">
+                                <div class="icons-run"></div>
+                            </div>
+                            <div class="btn btn-default btn-sm" title="重置" onclick="reset()">
+                                <div class="icons-reset"></div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <div class="btn btn-default btn-sm btn-adjList" title="显示邻接链表" onclick="getAdjList()">
+                                <div class="icons-adjList"></div>
                             </div>
                         </div>
                     </div>
