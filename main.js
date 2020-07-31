@@ -9,6 +9,8 @@ const floyd = require('./main/floyd')
 
 function createWindow() {
     // Create the browser window.
+    const menu = Menu.buildFromTemplate(template)
+    Menu.setApplicationMenu(menu)
     const mainWindow = new BrowserWindow({
         width: 1000,
         height: 800,
@@ -48,15 +50,78 @@ app.on('window-all-closed', function() {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
 
+let template = [{
+    label: '视图',
+    submenu: [{
+        label: '重新加载界面',
+        accelerator: 'CmdOrCtrl+R',
+        click: (item, focusedWindow) => {
+            if (focusedWindow) {
+                // on reload, start fresh and close any old
+                // open secondary windows
+                if (focusedWindow.id === 1) {
+                    BrowserWindow.getAllWindows().forEach(win => {
+                        if (win.id > 1) win.close()
+                    })
+                }
+                focusedWindow.reload()
+            }
+        }
+    }, {
+        label: '全屏',
+        accelerator: (() => {
+            if (process.platform === 'darwin') {
+                return 'Ctrl+Command+F'
+            } else {
+                return 'F11'
+            }
+        })(),
+        click: (item, focusedWindow) => {
+            if (focusedWindow) {
+                focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+            }
+        }
+    }, {
+        label: 'Toggle Developer Tools',
+        visible: false,
+        accelerator: (() => {
+            if (process.platform === 'darwin') {
+                return 'Alt+Command+I'
+            } else {
+                return 'Ctrl+Shift+I'
+            }
+        })(),
+        click: (item, focusedWindow) => {
+            if (focusedWindow) {
+                focusedWindow.toggleDevTools()
+            }
+        }
+    }]
+}, {
+    label: '窗口',
+    role: 'window',
+    submenu: [{
+        label: '最小化',
+        accelerator: 'CmdOrCtrl+M',
+        role: 'minimize'
+    }, {
+        label: '关闭',
+        accelerator: 'CmdOrCtrl+W',
+        role: 'close'
+    }, {
+        type: 'separator'
+    }]
+}]
+
+
+
 ipcMain.on('getMstByPrim', (event, arg) => {
     var mst = prim.prim(arg);
-    console.log(arg)
     event.sender.send('replyMst', mst);
 })
 
 ipcMain.on('getMstByKruskal', (event, arg) => {
     var mst = kruskal.kruskal(arg);
-    console.log(arg)
     event.sender.send('replyMst', mst);
 })
 

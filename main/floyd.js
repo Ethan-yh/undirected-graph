@@ -18,6 +18,10 @@ function floyd(adjMatrix) {
                 dis[id1] = {};
             }
             dis[id1][id2] = adjMatrix[id1][id2].power;
+            if (!pathMatrix[id1]) {
+                pathMatrix[id1] = {};
+            }
+            pathMatrix[id1][id2] = null;
         }
     }
 
@@ -53,7 +57,6 @@ function floyd(adjMatrix) {
         }
     }
 
-    console.log(paths);
     return paths;
 }
 

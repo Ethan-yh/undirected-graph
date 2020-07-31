@@ -4,12 +4,15 @@ if (!window.getI18NString) { getI18NString = function(s) { return s; } }
 ///drag and drop
 var DRAGINFO_PREFIX = "draginfo";
 
+
 function ondrag(evt) {
     evt = evt || window.event;
     var dataTransfer = evt.dataTransfer;
     var img = evt.target;
     dataTransfer.setData("text", img.getAttribute(DRAGINFO_PREFIX));
 }
+
+var circle = Q.Shapes.getShape(Q.Consts.SHAPE_CIRCLE, 20, 20);
 
 function createDNDImage(parent, src, title, info) {
     var img = document.createElement("img");
@@ -18,10 +21,10 @@ function createDNDImage(parent, src, title, info) {
     img.setAttribute("title", title);
     info = info || {};
     if (!info.image && (!info.type || info.type == "Node")) {
-        info.image = src;
+        info.image = "circle";
     }
-    info.label = info.label || title;
     info.title = title;
+
     img.setAttribute(DRAGINFO_PREFIX, JSON.stringify(info));
     img.ondragstart = ondrag;
     parent.appendChild(img);
@@ -31,17 +34,44 @@ function createDNDImage(parent, src, title, info) {
 
 var graph = new Q.Graph(canvas);
 graph.callLater(function() { graph.editable = true });
+var drawableInteraction = Q.DrawableInteraction(graph);
+
+graph.removeSelectionByInteraction = function(evt) {
+    graph.removeSelection();
+}
+
+var nameId = 1;
+
 
 graph.onElementCreated = function(element, evt, dragInfo) {
     Q.Graph.prototype.onElementCreated.call(this, element, evt, dragInfo);
     if (element instanceof Q.Edge) {
+        element.name = 10;
+
         element.setStyle(Q.Styles.ARROW_TO, false);
+
+        var labelUI = new Q.LabelUI(element.name);
+        var labelEditor = new Q.LabelEditor();
+
+        var x = document.body.clientWidth / 2 + (element.from.x + element.to.x) / 2;
+        var y = (document.body.clientHeight) / 2 + 100 + (element.from.y + element.to.y) / 2;
+        graph.startLabelEdit(element, labelUI, labelEditor, { x: x, y: y })
+
         return;
     }
-    if (element instanceof Q.Text) {
-        // element.setStyle(Styles.LABEL_BACKGROUND_COLOR, "#2898E0");
-        // element.setStyle(Styles.LABEL_COLOR, "#FFF");
-        // element.setStyle(Styles.LABEL_PADDING, new Q.Insets(3, 5));
+    if (element instanceof Q.Node) {
+        if (!dragInfo.label) {
+            element.name = 'Node' + nameId;
+            nameId++;
+        }
+        element.setStyle(Q.Styles.SHAPE_FILL_COLOR, dragInfo.color);
+        element.setStyle(Q.Styles.SHAPE_STROKE_STYLE, dragInfo.color);
+
+        var labelUI = new Q.LabelUI(element.name);
+        var labelEditor = new Q.LabelEditor();
+        var x = document.body.clientWidth / 2 + element.x;
+        var y = (document.body.clientHeight) / 2 + 118 + element.y;
+        graph.startLabelEdit(element, labelUI, labelEditor, { x: x, y: y })
         return;
     }
 }
@@ -62,13 +92,19 @@ initToolbox();
 // initDatas();
 
 
+
 function initToolbox() {
-    createDNDImage(toolbox, "static/images/node_icon.png", "Mac", { type: "Node", label: "Mac", image: "Q.Graphs.node" });
+    createDNDImage(toolbox, "static/images/circle1.png", "Node", { type: "Node", color: "#515151" });
+    createDNDImage(toolbox, "static/images/circle2.png", "Node", { type: "Node", color: "#d81e06" });
+    createDNDImage(toolbox, "static/images/circle3.png", "Node", { type: "Node", color: "#f4ea2a" });
+    createDNDImage(toolbox, "static/images/circle4.png", "Node", { type: "Node", color: "#1afa29" });
+    createDNDImage(toolbox, "static/images/circle5.png", "Node", { type: "Node", color: "#1296db" });
+    createDNDImage(toolbox, "static/images/node_icon.png", "Computer", { type: "Node", label: "Computer", image: "Q.Graphs.node" });
     createDNDImage(toolbox, "static/images/exchanger_icon.png", "Exchanger", { type: "Node", label: "Exchanger", image: "Q.Graphs.exchanger2" });
     createDNDImage(toolbox, "static/images/server_icon.png", "Server", { type: "Node", label: "Server", image: "Q.Graphs.server" });
-    createDNDImage(toolbox, "static/images/text_icon.png", "Text", { type: "Text", label: "Text" });
-    createDNDImage(toolbox, "static/images/group_icon.png", "Group", { type: "Group", label: "Group" });
-    createDNDImage(toolbox, "static/images/subnetwork_icon.png", "SubNetwork", { image: "Q-subnetwork", label: "SubNetwork", properties: { enableSubNetwork: true } }).style.width = '24px';
+    // createDNDImage(toolbox, "static/images/text_icon.png", "Text", { type: "Text", label: "Text" });
+    // createDNDImage(toolbox, "static/images/group_icon.png", "Group", { type: "Group", label: "Group" });
+    // createDNDImage(toolbox, "static/images/subnetwork_icon.png", "SubNetwork", { image: "Q-subnetwork", label: "SubNetwork", properties: { enableSubNetwork: true } }).style.width = '24px';
 }
 
 function initDatas() {
@@ -102,7 +138,6 @@ function initDatas() {
 
 var curTab = 'tab-edit';
 $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-    console.log(e.target.id)
     if (e.target.id === 'tab-edit') {
         graph.interactionMode = Q.Consts.INTERACTION_MODE_DEFAULT;
     } else {
@@ -117,9 +152,7 @@ $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
     updateBtns();
 })
 
-$("#btn1").click(() => {
-    console.log('click')
-})
+
 
 const titleToMode = {
     "默认模式": Q.Consts.INTERACTION_MODE_DEFAULT,
@@ -221,7 +254,6 @@ function isSimpleConnectedGraph() {
         if (!datas[i].from) {
             var linkedNodes = datas[i]._linkedNodes;
             if (datas[i].edgeCount == 0) {
-                console.log(datas[i]);
                 return 0;
             }
             for (let id in linkedNodes) {
@@ -371,7 +403,6 @@ function reset() {
     })
 
     if (source) {
-        console.log('source', source)
         source.removeUI(startUI);
         source = null;
     }
@@ -387,17 +418,15 @@ var multiPaths;
 
 
 function showPath(e) {
-
-    console.log('e', e)
     var pathType = e.getAttribute('pathtype');
 
     var pathElements;
     var path;
-    if (pathType === 'single') {
+    if (pathType == 'single') {
         pathElements = document.getElementsByClassName('single-source-path');
         var pathId = e.getAttribute('pathid');
         path = singlePaths[pathId];
-    } else if (pathType === 'multi') {
+    } else if (pathType == 'multi') {
         pathElements = document.getElementsByClassName('multi-source-path');
         var pathId1 = e.getAttribute('pathid1');
         var pathId2 = e.getAttribute('pathid2');
@@ -411,13 +440,11 @@ function showPath(e) {
     Q.appendClass(e, 'active');
 
     setTransparent();
-    console.log('path', path)
     var firstNode = graph.getElement(path[0]);
     firstNode.setStyle(Q.Styles.ALPHA, 1);
     for (let i = 1; i < path.length; i++) {
         var edgeId = adjMatrix[path[i - 1]][path[i]].edge;
         edge = graph.getElement(edgeId);
-        console.log('edge', edge)
         edge.setStyle(Q.Styles.ALPHA, 1);
         edge.from.setStyle(Q.Styles.ALPHA, 1);
         edge.to.setStyle(Q.Styles.ALPHA, 1);
@@ -463,9 +490,9 @@ function createPathListElement(path, classes, attributes) {
         pathListItem.setAttribute(attr, attributes[attr]);
     }
     pathListItem.addEventListener('click', (ev) => {
-        console.log(ev.target);
-        showPath(ev.target);
-    })
+        var ele = ev.target.tagName === 'A' ? ev.target : ev.target.parentElement;
+        showPath(ele);
+    }, true)
     path.forEach(nodeId => {
         pathListItem.innerHTML += graph.getElement(nodeId).name + ' ';
     })
@@ -548,18 +575,9 @@ function showWarning(text) {
 
 }
 
-var nameId = 1;
 
-graph.onElementCreated = function(element, evt, dragInfo) {
 
-    if (element.from) {
-        element.name = 10;
-        element.setStyle(Q.Styles.ARROW_TO, false);
-    } else {
-        element.name = 'node' + nameId;
-        nameId++;
-    }
-}
+
 
 graph.onLabelEdit = function(element, label, text, elementUI) {
     if (element.from) {

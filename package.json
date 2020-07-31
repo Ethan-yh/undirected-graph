@@ -1,10 +1,10 @@
 {
-    "name": "undirected-graph",
+    "name": "yh-graph",
     "version": "1.0.0",
-    "description": "An undirected-graph application",
+    "description": "An graph application",
     "main": "main.js",
     "build": {
-        "appId": "com.undirected-graph.app",
+        "appId": "com.graph.app",
         "mac": {
             "target": [
                 "dmg",
@@ -16,7 +16,7 @@
                 "nsis",
                 "zip"
             ],
-            "icon": "./images/metro.ico"
+            "icon": "./static/images/udg.ico"
         }
     },
     "scripts": {
@@ -25,6 +25,7 @@
     },
     "author": "Ethan-yh",
     "devDependencies": {
-        "electron": "^9.1.0"
+        "electron": "^9.1.0",
+        "electron-builder": "^22.7.0"
     }
 }
