@@ -1,3 +1,5 @@
+//该文件使用prim算法求最小生成树
+
 function minEdge(lowCost) {
     var min = Number.MAX_VALUE;
     var index = -1;

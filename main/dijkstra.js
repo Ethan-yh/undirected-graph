@@ -1,3 +1,5 @@
+//该文件使用迪杰斯特拉算法求单源最短路径
+
 function getPath(id, prev) {
     var path = [];
     var index;

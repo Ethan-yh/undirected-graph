@@ -1,3 +1,5 @@
+//该文件使用kruskal算法求最小生成树
+
 function kruskal(data) {
     var adjMatrix = data.adjMatrix;
     var edges = data.edges;

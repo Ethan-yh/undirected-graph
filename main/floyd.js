@@ -1,3 +1,5 @@
+//该文件使用floyd算法求多源最短路径
+
 function getPaths(pathMatrix, path, start, end) {
     var middle = pathMatrix[start][end];
     if (!middle) {
